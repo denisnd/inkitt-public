@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <meta charset="UTF-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Autosuggest Vanilla JS, Inkitt test</title>
+	<link href="styles.css" rel="stylesheet"></head>
+	<body>
+	<h1>Autosuggest (Vanilla JS), Inkitt test</h1>
+	<div id="autosuggest_container">
+		<input type="text" class="autosuggest__input" placeholder="Search fruits">
+		<div class="autosuggest__dropdown"></div>
+	</div>
+	<script type="text/javascript" src="vanilla.js"></script>
+	<script type="text/javascript">
+		function DataProvider(values, delay) {
+    		this.entries = values.map(function(value) { return [value.toLowerCase(), value] });
+
+    		this.delay = delay;
+		}
+
+		DataProvider.prototype.search = function(query, limit, successCb, errorCb) {
+            if (typeof query !== 'string') {
+                errorCb('Wrong query, must be a string');
+            }
+
+            if (isNaN(this.delay) || this.delay < 0) {
+                errorCb('Wrong delay value, must be positive number');
+            }
+
+        	var normalizedQuery = query.toLowerCase();
+
+            var results =
+                this.entries
+                    .filter(function(entry) { return entry[0].indexOf(normalizedQuery) !== -1 }) // filtering normalized values
+                    .map(function(entry) { return entry[1]}) // returning original values
+                    .slice(0, limit); // applying limits
+
+            setTimeout(successCb, this.delay, query, results);
+        }			
+
+		var as = new AutoSuggestVanilla(
+			document.getElementById('autosuggest_container'),
+			new DataProvider(
+			    ['Apple', 'Pineapple', 'Orange', 'Tomato', 'Grapefruit', 'Cherry', 'Blueberry', 'Cranberry', 'Strawberry'],
+			    700				
+			),
+			5
+		);
+	</script>
+</body>
+</html>
